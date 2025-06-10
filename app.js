@@ -87,8 +87,12 @@ class ColorSamplingTool {
 
     sampleColor(e) {
         const rect = this.imageCanvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const scaleX = this.imageCanvas.width / rect.width;
+        const scaleY = this.imageCanvas.height / rect.height;
+        
+        const x = Math.floor((e.clientX - rect.left) * scaleX);
+        const y = Math.floor((e.clientY - rect.top) * scaleY);
+        
         const pixel = this.ctx.getImageData(x, y, 1, 1).data;
         
         const color = {
