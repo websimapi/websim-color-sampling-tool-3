@@ -97,3 +97,15 @@ body {
     cursor: pointer;
     z-index: 11; /* Ensure it's above the color details */
 }
+
+.magnifier {
+    position: absolute;
+    border: 2px solid #333;
+    border-radius: 50%;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 300%;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}

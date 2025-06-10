@@ -7,6 +7,15 @@ class ColorSamplingTool {
         this.colorPalette = document.getElementById('colorPalette');
         this.ctx = this.imageCanvas.getContext('2d');
 
+        // Magnifier elements
+        this.magnifier = document.createElement('div');
+        this.magnifier.className = 'magnifier';
+        document.body.appendChild(this.magnifier);
+        
+        // Magnifier settings
+        this.magnifierSize = 100;
+        this.magnificationFactor = 4;
+
         this.setupEventListeners();
         this.loadSavedPalette();
     }
@@ -22,6 +31,10 @@ class ColorSamplingTool {
         
         // Add click event listener to sample colors
         this.imageCanvas.addEventListener('click', this.sampleColor.bind(this));
+        // Add mousemove listener for magnification
+        this.imageCanvas.addEventListener('mousemove', this.updateMagnifier.bind(this));
+        this.imageCanvas.addEventListener('mouseenter', this.showMagnifier.bind(this));
+        this.imageCanvas.addEventListener('mouseleave', this.hideMagnifier.bind(this));
     }
 
     preventDefaults(e) {
@@ -173,6 +186,54 @@ class ColorSamplingTool {
                 hsl: this.rgbToHsl(...color.match(/\d+/g).map(Number))
             });
         });
+    }
+
+    showMagnifier() {
+        this.magnifier.style.display = 'block';
+    }
+
+    hideMagnifier() {
+        this.magnifier.style.display = 'none';
+    }
+
+    updateMagnifier(e) {
+        const rect = this.imageCanvas.getBoundingClientRect();
+        const scaleX = this.imageCanvas.width / rect.width;
+        const scaleY = this.imageCanvas.height / rect.height;
+        
+        const x = Math.floor((e.clientX - rect.left) * scaleX);
+        const y = Math.floor((e.clientY - rect.top) * scaleY);
+
+        // Position the magnifier
+        this.magnifier.style.width = `${this.magnifierSize}px`;
+        this.magnifier.style.height = `${this.magnifierSize}px`;
+        this.magnifier.style.left = `${e.clientX - this.magnifierSize/2}px`;
+        this.magnifier.style.top = `${e.clientY - this.magnifierSize/2}px`;
+
+        // Create magnified view
+        const magnifiedImage = this.ctx.getImageData(
+            Math.max(0, x - this.magnifierSize / (2 * this.magnificationFactor)),
+            Math.max(0, y - this.magnifierSize / (2 * this.magnificationFactor)), 
+            this.magnifierSize / this.magnificationFactor, 
+            this.magnifierSize / this.magnificationFactor
+        );
+
+        // Create canvas to scale up the magnified image
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = this.magnifierSize;
+        tempCanvas.height = this.magnifierSize;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Scale up the image data
+        tempCtx.putImageData(magnifiedImage, 0, 0);
+        tempCtx.scale(this.magnificationFactor, this.magnificationFactor);
+        tempCtx.drawImage(tempCanvas, 0, 0);
+
+        // Set magnifier background
+        this.magnifier.style.backgroundImage = `url(${tempCanvas.toDataURL()})`;
+        
+        // Draw a crosshair
+        this.magnifier.style.backgroundImage += `, linear-gradient(to bottom, rgba(0,0,0,0.2) 49%, transparent 50%, rgba(0,0,0,0.2) 51%), linear-gradient(to right, rgba(0,0,0,0.2) 49%, transparent 50%, rgba(0,0,0,0.2) 51%)`;
     }
 }
 
