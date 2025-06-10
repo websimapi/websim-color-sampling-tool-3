@@ -26,6 +26,11 @@ body {
     background-color: #f0f0f0;
 }
 
+.drop-zone.drag-over {
+    background-color: #e0e0e0;
+    border-color: #999;
+}
+
 #imageCanvas {
     max-width: 100%;
     margin-top: 10px;
@@ -85,4 +90,3 @@ body {
     padding: 2px 5px;
     cursor: pointer;
 }
-

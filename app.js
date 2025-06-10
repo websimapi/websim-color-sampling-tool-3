@@ -16,10 +16,9 @@ class ColorSamplingTool {
         this.imageUpload.addEventListener('change', (e) => this.handleImageUpload(e));
         this.dropZone.addEventListener('click', () => this.imageUpload.click());
         this.dropZone.addEventListener('dragover', this.preventDefaults);
+        this.dropZone.addEventListener('dragenter', this.highlightDropZone.bind(this));
+        this.dropZone.addEventListener('dragleave', this.unhighlightDropZone.bind(this));
         this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
-
-        // Canvas Click for Color Sampling
-        this.imageCanvas.addEventListener('click', this.sampleColor.bind(this));
     }
 
     preventDefaults(e) {
@@ -27,18 +26,39 @@ class ColorSamplingTool {
         e.stopPropagation();
     }
 
+    highlightDropZone(e) {
+        this.preventDefaults(e);
+        this.dropZone.classList.add('drag-over');
+    }
+
+    unhighlightDropZone(e) {
+        this.preventDefaults(e);
+        this.dropZone.classList.remove('drag-over');
+    }
+
     handleDrop(e) {
         this.preventDefaults(e);
+        this.dropZone.classList.remove('drag-over');
         const files = e.dataTransfer.files;
-        this.processImageFile(files[0]);
+        if (files.length > 0) {
+            this.processImageFile(files[0]);
+        }
     }
 
     handleImageUpload(e) {
-        const file = e.target.files[0];
-        this.processImageFile(file);
+        const files = e.target.files;
+        if (files.length > 0) {
+            this.processImageFile(files[0]);
+        }
     }
 
     processImageFile(file) {
+        // Validate file is an image
+        if (!file || !file.type.startsWith('image/')) {
+            console.error('Invalid file type');
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = (event) => {
             const img = new Image();
@@ -46,9 +66,19 @@ class ColorSamplingTool {
                 this.imageCanvas.width = img.width;
                 this.imageCanvas.height = img.height;
                 this.ctx.drawImage(img, 0, 0);
+                this.dropZone.textContent = 'Image Uploaded';
+            };
+            img.onerror = () => {
+                console.error('Error loading image');
+                this.dropZone.textContent = 'Error Loading Image';
             };
             img.src = event.target.result;
         };
+
+        reader.onerror = (error) => {
+            console.error('FileReader error', error);
+        };
+
         reader.readAsDataURL(file);
     }
 
@@ -143,4 +173,3 @@ class ColorSamplingTool {
 document.addEventListener('DOMContentLoaded', () => {
     new ColorSamplingTool();
 });
-
