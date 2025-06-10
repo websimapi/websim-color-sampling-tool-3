@@ -19,6 +19,9 @@ class ColorSamplingTool {
         this.dropZone.addEventListener('dragenter', this.highlightDropZone.bind(this));
         this.dropZone.addEventListener('dragleave', this.unhighlightDropZone.bind(this));
         this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
+        
+        // Add click event listener to sample colors
+        this.imageCanvas.addEventListener('click', this.sampleColor.bind(this));
     }
 
     preventDefaults(e) {
