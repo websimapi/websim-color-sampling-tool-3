@@ -124,11 +124,45 @@ class ColorSamplingTool {
 
         const colorDetails = document.createElement('div');
         colorDetails.className = 'color-details';
-        colorDetails.innerHTML = `
-            RGB: ${color.rgb}<br>
-            HEX: ${color.hex}<br>
-            HSL: ${color.hsl}
-        `;
+        
+        // Create clickable color value elements
+        const rgbSpan = document.createElement('span');
+        rgbSpan.textContent = `RGB: ${color.rgb}`;
+        rgbSpan.className = 'copyable';
+        rgbSpan.setAttribute('data-copy', color.rgb);
+        
+        const hexSpan = document.createElement('span');
+        hexSpan.textContent = `HEX: ${color.hex}`;
+        hexSpan.className = 'copyable';
+        hexSpan.setAttribute('data-copy', color.hex);
+        
+        const hslSpan = document.createElement('span');
+        hslSpan.textContent = `HSL: ${color.hsl}`;
+        hslSpan.className = 'copyable';
+        hslSpan.setAttribute('data-copy', color.hsl);
+
+        // Add click event to copy values
+        [rgbSpan, hexSpan, hslSpan].forEach(span => {
+            span.addEventListener('click', (e) => {
+                const valueToCopy = e.target.getAttribute('data-copy');
+                navigator.clipboard.writeText(valueToCopy).then(() => {
+                    // Optional: Add a temporary visual feedback
+                    e.target.classList.add('copied');
+                    setTimeout(() => {
+                        e.target.classList.remove('copied');
+                    }, 500);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            });
+        });
+
+        // Append clickable spans to color details
+        colorDetails.appendChild(rgbSpan);
+        colorDetails.appendChild(document.createElement('br'));
+        colorDetails.appendChild(hexSpan);
+        colorDetails.appendChild(document.createElement('br'));
+        colorDetails.appendChild(hslSpan);
 
         const removeBtn = document.createElement('button');
         removeBtn.textContent = '×';

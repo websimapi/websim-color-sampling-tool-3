@@ -68,6 +68,22 @@ body {
     box-sizing: border-box;
 }
 
+.color-details .copyable {
+    cursor: pointer;
+    transition: color 0.3s;
+    display: inline-block;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.color-details .copyable:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.color-details .copyable.copied {
+    background-color: rgba(0,255,0,0.3);
+}
+
 .color-sample:hover .color-details {
     display: block;
 }
